@@ -1,0 +1,8 @@
+# Host + client 双端插件。要求 DSH（DeepSeek Harness）>= 0.2.2-rc.1。
+#  - host 端（src/host/）：技能发现、点名列表（$DSH_HOME/skill-autoload.yml）、
+#    AGENTS.md 标记区块渲染与写回，以及 /skills /toggle /sync /page /theme 路由。
+#  - client 端（src/client/）：左侧栏底部动作区（sidebar.footer.action）挂「技能常驻」入口，
+#    点击在应用内挂同源 iframe 浮层（可拖动，默认居中）。
+- insert:
+    - id: skill-autoload
+      name: 'dsh-skill-autoload'

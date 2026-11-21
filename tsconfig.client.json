@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"lib": ["ES2023", "DOM", "DOM.Iterable"],
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
+		"types": [],
+		"skipLibCheck": true,
+		"jsx": "react",
+		"isolatedModules": true,
+		"strict": true
+	},
+	"include": ["src/client/**/*.tsx"]
+}
