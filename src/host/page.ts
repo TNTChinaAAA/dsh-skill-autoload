@@ -108,6 +108,11 @@ export const PANEL_PAGE_HTML = `<!DOCTYPE html>
   button:disabled { opacity: 0.4; cursor: not-allowed; }
   button.primary { background: var(--accent); color: var(--accent-fg); border-color: transparent; }
   button.primary:hover { background: var(--dsw-alias-button-primary-hover); }
+  /* 筛选开关：选中态用主色描边 + 浅底，与普通按钮区分。 */
+  button.toggle[aria-pressed="true"] {
+    border-color: var(--accent); color: var(--accent-fg); background: var(--accent);
+  }
+  button.toggle[aria-pressed="true"]:hover { background: var(--dsw-alias-button-primary-hover); border-color: transparent; }
   .list { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 20px 40px; }
   .list > * { max-width: 860px; margin-left: auto; margin-right: auto; }
   .empty { color: var(--muted); text-align: center; padding: 48px 0; font-size: 13px; }
@@ -145,7 +150,7 @@ export const PANEL_PAGE_HTML = `<!DOCTYPE html>
 <div class="wrap">
   <div class="topbar">
     <h1>技能常驻</h1>
-    <span class="ver">v0.1.0</span>
+    <span class="ver">v0.1.1</span>
     <div class="budget">
       <span id="budgetText">— / 64 KB</span>
       <div class="bar" id="budgetBar"><i></i></div>
@@ -153,6 +158,7 @@ export const PANEL_PAGE_HTML = `<!DOCTYPE html>
   </div>
   <div class="toolbar">
     <input id="q" type="search" placeholder="过滤技能名 / 描述…" />
+    <button id="onlyBtn" class="toggle" aria-pressed="false" title="只看已经常驻的技能">仅显示已常驻</button>
     <button id="refreshBtn">刷新</button>
     <button class="primary" id="syncBtn">重写 AGENTS.md</button>
   </div>
@@ -164,6 +170,8 @@ export const PANEL_PAGE_HTML = `<!DOCTYPE html>
   var BASE = '/plugins/dsh-skill-autoload';
   var state = { skills: [], missing: [], blockBytes: 0, budgetBytes: 65536 };
   var busy = false;
+  /** 只看已常驻（工具栏开关）。 */
+  var onlyResident = false;
 
   var themePref = 'system';
   var darkMedia = null;
@@ -211,9 +219,11 @@ export const PANEL_PAGE_HTML = `<!DOCTYPE html>
     listEl.innerHTML = '';
 
     var all = state.skills || [];
-    var shown = q
-      ? all.filter(function (s) { return s.name.toLowerCase().indexOf(q) >= 0 || (s.description || '').toLowerCase().indexOf(q) >= 0; })
-      : all;
+    var shown = all.filter(function (s) {
+      if (onlyResident && !s.resident) return false;
+      if (!q) return true;
+      return s.name.toLowerCase().indexOf(q) >= 0 || (s.description || '').toLowerCase().indexOf(q) >= 0;
+    });
 
     if (state.missing && state.missing.length) {
       var w = document.createElement('div');
@@ -225,7 +235,11 @@ export const PANEL_PAGE_HTML = `<!DOCTYPE html>
     if (!shown.length) {
       var e = document.createElement('div');
       e.className = 'empty';
-      e.textContent = all.length ? '没有匹配的技能' : '没发现任何技能（检查 ~/.dsh/skills）';
+      e.textContent = !all.length
+        ? '没发现任何技能（检查 ~/.dsh/skills）'
+        : (onlyResident && !all.some(function (s) { return s.resident; }))
+          ? '还没有常驻任何技能 — 关掉「仅显示已常驻」再勾选'
+          : '没有匹配的技能';
       listEl.appendChild(e);
     }
 
@@ -310,6 +324,13 @@ export const PANEL_PAGE_HTML = `<!DOCTYPE html>
       else { toast('加载失败：' + (res.error || '')); }
     }).catch(function (err) { toast('加载失败：' + err); });
   }
+
+  var onlyBtn = document.getElementById('onlyBtn');
+  onlyBtn.onclick = function () {
+    onlyResident = !onlyResident;
+    onlyBtn.setAttribute('aria-pressed', onlyResident ? 'true' : 'false');
+    render();
+  };
 
   document.getElementById('q').oninput = render;
   document.getElementById('refreshBtn').onclick = function () { load(); toast('已刷新'); };
