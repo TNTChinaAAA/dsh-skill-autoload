@@ -4,7 +4,8 @@
 靠 `@deepseek-ai/dsh-agent-instructions` 的窗口检测实现「还在窗口里就不重复注入、被压缩或滑出就下一步自动补回」。
 
 > 维护者：**TNTChinaAAA** · https://github.com/TNTChinaAAA/dsh-skill-autoload
-> 只支持 **DSH ≥ `0.2.2-rc.1`**（0.22-rc1 及以后），更低版本不作兼容与验证。
+> **DSH 兼容范围**：`^0.2.1-rc.5 || ^0.2.2-rc.1` —— 即 **`0.2.1-rc.5` 起**（0.2.1.x 与 0.2.2.x 全系列，含 prerelease）。
+> 通过 `package.json` 的 `engines.dsh` 声明，**不需要改任何代码**；DSH 的 loader 见到 `engines.dsh` 就单独据此判定，不再回退到 peer 依赖。
 
 ## 🪶 零外部依赖
 
@@ -14,7 +15,7 @@
 | --- | --- |
 | host（`lib/host/index.mjs`） | 只有 Node 内置模块（`node:fs` / `node:path` / `node:os`） |
 | client（`lib/client/client.js`） | 只有 DSH 自己注入的 `react` |
-| `package.json` | **没有 `peerDependencies`、没有 `dependencies`、没有 `devDependencies`** |
+| `package.json` | **没有 `peerDependencies`、没有 `dependencies`、没有 `devDependencies`**；兼容性只由 `engines.dsh` 一处声明 |
 
 构建产物已随仓库提交（`lib/`），克隆下来直接放进 profile 的 `node_modules` 就能跑。
 
@@ -131,7 +132,7 @@ scripts/build.mjs       # esbuild 双产物（client 套 __ModuleLoader__.load �
 
 ## 🧩 兼容性
 
-- **DSH 版本：`≥ 0.2.2-rc.1`**（0.22-rc1 起）。更低版本不作兼容与验证。
+- **DSH 版本：`^0.2.1-rc.5 || ^0.2.2-rc.1`**（`0.2.1-rc.5` 起，覆盖 0.2.1.x / 0.2.2.x）。更低版本不作兼容与验证。
 - DSH web / desktop profile 插件（host + client 双端），React 18。
 - Node `^22.19.0 || >=24.0.0`。
 
