@@ -33,6 +33,8 @@ await build({
 	target: "node22",
 	outfile: join(root, "lib/host/index.mjs"),
 	external: ["node:*"],
+	/* 插件里有大量中文注释与页面文案：utf8 输出才可读，也避免 \uXXXX 把体积撑大。 */
+	charset: "utf8",
 	logLevel: "info"
 });
 
@@ -44,6 +46,7 @@ await build({
 	target: "es2022",
 	outfile: join(root, "lib/client/client.js"),
 	external: ["react"],
+	charset: "utf8",
 	banner: { js: clientShell },
 	footer: { js: clientShellEnd },
 	logLevel: "info"
