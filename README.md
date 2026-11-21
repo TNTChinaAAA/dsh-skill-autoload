@@ -6,6 +6,21 @@
 > 维护者：**TNTChinaAAA** · https://github.com/TNTChinaAAA/dsh-skill-autoload
 > 只支持 **DSH ≥ `0.2.2-rc.1`**（0.22-rc1 及以后），更低版本不作兼容与验证。
 
+## 🪶 零外部依赖
+
+这个插件**不需要 `npm install`，也不需要任何第三方包**：
+
+| 半边 | 运行时依赖 |
+| --- | --- |
+| host（`lib/host/index.mjs`） | 只有 Node 内置模块（`node:fs` / `node:path` / `node:os`） |
+| client（`lib/client/client.js`） | 只有 DSH 自己注入的 `react` |
+| `package.json` | **没有 `peerDependencies`、没有 `dependencies`、没有 `devDependencies`** |
+
+构建产物已随仓库提交（`lib/`），克隆下来直接放进 profile 的 `node_modules` 就能跑。
+
+之所以刻意不声明 peer 依赖：DSH 的 profile loader 会拿 `peerDependencies` 的版本范围去卡运行时版本，
+范围一旦对不上就整包 `skipping profile bundle`。零声明就没有这道门槛。
+
 ## 📌 它解决什么
 
 DSH 的技能默认是「按 description 匹配」或「手打斜杠命令」才加载。高频技能每次都靠匹配，既不稳定也多绕一程。

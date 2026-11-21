@@ -1,6 +1,5 @@
 node_modules/
 .tmp/
-lib/
 dist/
 *.log
 .DS_Store
